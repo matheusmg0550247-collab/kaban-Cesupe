@@ -19,7 +19,7 @@ HEADERS = None
 
 def get_empty_df():
     """Retorna um DataFrame vazio com a estrutura do Kanban."""
-    # Garante que a coluna de Progresso seja do tipo 'int' para o slider
+    # Garante que a coluna de Progresso seja do tipo 'int'
     df = pd.DataFrame(columns=["Tarefa", "Início", "Previsão", "Progresso (%)", "Colaboradores"])
     df["Progresso (%)"] = df["Progresso (%)"].astype("int64") 
     return df
@@ -162,13 +162,14 @@ edited_df = st.data_editor(
         "Previsão": st.column_config.DateColumn(
             "Previsão de Término", format="DD/MM/YYYY"
         ),
-        "Progresso (%)": st.column_config.SliderColumn(  
+        # --- AQUI ESTÁ A MUDANÇA (PLANO B) ---
+        "Progresso (%)": st.column_config.NumberInputColumn(
             "Progresso (%)",
-            help="Arraste o slider para ajustar a % concluída",
+            help="Digite a % concluída (0-100)",
             min_value=0,
             max_value=100,
             step=1, 
-            format="%d%%",
+            format="%d%%", # Ainda mostra como %
         ),
         "Colaboradores": st.column_config.ListColumn(
             "Colaboradores",

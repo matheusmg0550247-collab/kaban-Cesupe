@@ -18,7 +18,6 @@ try:
     GITHUB_USER = st.secrets["GITHUB_USER"]
     GITHUB_REPO = st.secrets["GITHUB_REPO"]
     GITHUB_FILE_PATH = st.secrets["GITHUB_FILE_PATH"]
-    WEBHOOK_URL = st.secrets["WEBHOOK_URL"]
     
     # URL da API do GitHub para o arquivo
     API_URL = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
@@ -30,7 +29,8 @@ try:
     }
 
 except KeyError:
-    st.error("Erro: Configure seus GITHUB_* e WEBHOOK_URL nos Streamlit Secrets.")
+    st.error("Erro: Configure seus GITHUB_TOKEN, GITHUB_USER, GITHUB_REPO e GITHUB_FILE_PATH nos Streamlit Secrets.")
+    st.info("O erro anterior sobre WEBHOOK_URL foi removido, mas os segredos do GitHub ainda são necessários.")
     st.stop()
 
 
@@ -152,30 +152,6 @@ if st.session_state.data is not None:
         # Atualiza os dados na session_state antes de salvar
         st.session_state.data = edited_df
         salvar_dados_github(edited_df)
-
-    # --- Seção do Webhook ---
-    st.header("Notificações", divider="gray")
-    
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
-        mensagem_webhook = st.text_input("Mensagem para enviar via webhook:", "Alerta: Verifique o Kanban!")
-    
-    with col2:
-        # Alinha o botão com o campo de texto
-        st.write(" ") # Gambiarra para alinhamento vertical
-        if st.button("Enviar Notificação 🚀"):
-            try:
-                # Payload simples (comum para Discord/Slack)
-                payload = {"content": mensagem_webhook} 
-                
-                # Para Microsoft Teams, o payload é diferente:
-                # payload = {"text": mensagem_webhook}
-                
-                requests.post(WEBHOOK_URL, json=payload)
-                st.success("Mensagem enviada para o webhook!")
-            except Exception as e:
-                st.error(f"Erro ao enviar webhook: {e}")
 
 else:
     st.error("Não foi possível carregar os dados. Verifique os logs e os Secrets.")

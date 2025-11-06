@@ -36,7 +36,7 @@ if 'github_configured' not in st.session_state:
         GITHUB_FILE_PATH = st.secrets["GITHUB_FILE_PATH"]
         
         # Se tudo deu certo, configura as variáveis globais
-        API_URL = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+        API_URL = f"https.api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
         HEADERS = {
             "Authorization": f"token {GITHUB_TOKEN}",
             "Accept": "application/vnd.github.v3+json"
@@ -162,12 +162,12 @@ edited_df = st.data_editor(
         "Previsão": st.column_config.DateColumn(
             "Previsão de Término", format="DD/MM/YYYY"
         ),
-        "Progresso (%)": st.column_config.SliderColumn(  # <-- AQUI ESTÁ A MUDANÇA
+        "Progresso (%)": st.column_config.SliderColumn(  
             "Progresso (%)",
             help="Arraste o slider para ajustar a % concluída",
             min_value=0,
             max_value=100,
-            step=1, # Define o incremento (você pode mudar para 5 se quiser)
+            step=1, 
             format="%d%%",
         ),
         "Colaboradores": st.column_config.ListColumn(

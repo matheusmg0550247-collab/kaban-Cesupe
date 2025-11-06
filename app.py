@@ -19,7 +19,10 @@ HEADERS = None
 
 def get_empty_df():
     """Retorna um DataFrame vazio com a estrutura do Kanban."""
-    return pd.DataFrame(columns=["Tarefa", "Início", "Previsão", "Progresso (%)", "Colaboradores"])
+    # Garante que a coluna de Progresso seja do tipo 'int' para o slider
+    df = pd.DataFrame(columns=["Tarefa", "Início", "Previsão", "Progresso (%)", "Colaboradores"])
+    df["Progresso (%)"] = df["Progresso (%)"].astype("int64") 
+    return df
 
 # --- Verificação de Secrets e Configuração ---
 
@@ -66,6 +69,10 @@ def carregar_dados_github():
             return get_empty_df()
             
         df = pd.DataFrame(json.loads(content))
+        # Garante que a coluna de progresso seja numérica
+        if "Progresso (%)" not in df.columns:
+             df["Progresso (%)"] = 0
+        df["Progresso (%)"] = pd.to_numeric(df["Progresso (%)"], errors='coerce').fillna(0).astype("int64")
         return df
 
     except requests.exceptions.HTTPError as err:
@@ -87,6 +94,9 @@ def salvar_dados_github(df):
         return False
         
     try:
+        # Garante que o progresso seja salvo como número
+        df["Progresso (%)"] = pd.to_numeric(df["Progresso (%)"], errors='coerce').fillna(0).astype("int64")
+        
         data_json = df.to_json(orient='records')
         data_b64 = base64.b64encode(data_json.encode('utf-8')).decode('utf-8')
         
@@ -152,12 +162,13 @@ edited_df = st.data_editor(
         "Previsão": st.column_config.DateColumn(
             "Previsão de Término", format="DD/MM/YYYY"
         ),
-        "Progresso (%)": st.column_config.ProgressColumn(
+        "Progresso (%)": st.column_config.SliderColumn(  # <-- AQUI ESTÁ A MUDANÇA
             "Progresso (%)",
-            help="Ajuste manual da % concluída",
-            format="%d%%",
+            help="Arraste o slider para ajustar a % concluída",
             min_value=0,
             max_value=100,
+            step=1, # Define o incremento (você pode mudar para 5 se quiser)
+            format="%d%%",
         ),
         "Colaboradores": st.column_config.ListColumn(
             "Colaboradores",
